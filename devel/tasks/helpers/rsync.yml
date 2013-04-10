@@ -1,0 +1,7 @@
+
+- name: rsync files ${files} if they exist
+  action: shell chdir=${source_path}
+    if [ -f ${item} ]; then /usr/bin/rsync -L
+    -e "ssh -oBatchMode=yes -oStrictHostKeyChecking=no" 
+    ${item} ${dest_user}@${dest_host}:${dest_path}; fi
+  with_items: ${files}

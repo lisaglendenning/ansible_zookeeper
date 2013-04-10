@@ -1,0 +1,16 @@
+---
+
+zk: zookeeper
+zk_version: 3.4.5
+
+zk_source_path: /usr/share/zookeeper/source
+zk_devel_user: zookeeper
+zk_devel_group: zookeeper
+
+zk_build_client_c: false
+zk_build_client_python: false
+
+# these must be set to run the publish task
+#zk_publish_user:
+#zk_publish_host:
+#zk_publish_path:

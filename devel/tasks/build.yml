@@ -1,0 +1,38 @@
+---
+
+- name: build ZooKeeper artifacts
+  hosts: zookeeper_devel
+  sudo: False
+  vars:
+    - git_cmd: /usr/bin/git
+    - ant_cmd: $ANT_HOME/bin/ant
+    - release_targets: [tar]
+    - client_c_targets: [package-native]
+    - client_python_targets: [tar-bin]
+  vars_files:
+    - [../vars/devel_site.yml, ../vars/devel.yml]
+    
+  tasks:
+    - name: update source
+      action: command chdir=${zk_source_path} ${git_cmd} pull
+    
+    - name: build ZooKeeper java release
+      action: shell chdir=${zk_source_path}/ ${ant_cmd} ${item}
+      with_items: $release_targets
+
+    - name: build ZooKeeper client C bindings
+      action: shell chdir=${zk_source_path} ${ant_cmd} ${item}
+      with_items: $client_c_targets
+      when_boolean: $zk_build_client_c
+      
+    - name: add architecture to C library name
+      action: shell chdir=${zk_source_path}/build
+        ln -s ${zk}-${zk_version}-lib.tar.gz 
+        ${zk}-${zk_version}-lib-${ansible_machine}.tar.gz
+      when_boolean: $zk_build_client_c
+      
+    - name: build ZooKeeper client python bindings
+      action: shell chdir=${zk_source_path}/src/contrib/zkpython
+        ${ant_cmd} ${item}
+      with_items: $client_python_targets
+      when_boolean: $zk_build_client_python
