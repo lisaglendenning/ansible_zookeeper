@@ -17,7 +17,7 @@
     - action: java state=jdk version=${java_version}
 
 # The ant packages require OpenJDK, overwriting our hard work to install Oracle Java!
-- include: helpers/install_ant.yml
+- include: install_ant.yml
 
 - name: install packages required for building
   hosts: zookeeper_devel
@@ -40,18 +40,18 @@
   
     - include: 
         > 
-          helpers/install_packages.yml 
+          ../../common/tasks/install_packages.yml 
           packages=${release_packages}
           
     - include: 
         > 
-          helpers/install_packages.yml 
+          ../../common/tasks/install_packages.yml 
           packages=${client_c_packages}
       when_boolean: $zk_build_client_c
           
     - include: 
         > 
-          helpers/install_packages.yml 
+          ../../common/tasks/install_packages.yml 
           packages=${client_python_packages}
       when_boolean: $zk_build_client_python
 
@@ -65,7 +65,7 @@
   tasks:
     - include: 
         > 
-          helpers/install_packages.yml 
+          ../../common/tasks/install_packages.yml 
           packages=${git_packages}
           
 - name: checkout ZooKeeper source
