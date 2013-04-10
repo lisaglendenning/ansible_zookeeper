@@ -1,0 +1,6 @@
+---
+
+- include: install_libzookeeper.yml
+
+- include: install_zkpython.yml
+

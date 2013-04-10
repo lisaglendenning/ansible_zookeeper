@@ -1,0 +1,17 @@
+# parameters:
+#   dir
+#   file
+#   user
+#   symlink
+
+---
+
+  - name: extract ${file}
+    action: shell chdir=${dir} creates=${dir}/${extracted}
+      sudo -u ${user} tar xzf ${file}
+    only_if: "'${file}'.endswith('.tar.gz')"
+  
+  - name: symbolic link ${extracted} to ${symlink}
+    action: shell chdir=${dir} creates=${dir}/${symlink}
+      sudo -u ${user} ln -s ${extracted} ${symlink}
+    when_set: ${symlink}

@@ -1,0 +1,11 @@
+# executes all deploy tasks
+
+---
+
+- include: tasks/setup.yml
+
+- include: tasks/install_dist.yml
+
+- include: tasks/install_server.yml
+
+- include: tasks/install_client.yml

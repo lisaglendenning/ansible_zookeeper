@@ -1,0 +1,26 @@
+{#- Jinja2 template -#}
+
+{%- macro print_id(id) -%}
+{{ id }}
+{%- endmacro -%}
+
+{%- set id = zk_id -%}
+{%- if id is defined -%}
+    {{- print_id(id) -}}
+{%- else -%}
+    {%- set hostname = inventory_hostname|default('') -%}
+    {%- set ensemble = zk_ensemble|default(()) -%}
+    {%- set ensembles = groups|default(()) -%}
+    {%- if ensembles and ensemble and ensemble in ensembles -%}
+        {%- set ensemble = ensembles[ensemble] -%}
+    {%- endif -%}
+    {%- if hostname and hostname in ensemble -%}
+        {%- for host in ensemble|sort -%}
+            {%- if hostname == host -%} 
+                {{- print_id(loop.index) -}}
+            {%- endif -%}
+        {%- endfor -%}
+    {%- else -%}
+        {{- print_id(1) -}}
+    {%- endif -%}
+{%- endif -%}

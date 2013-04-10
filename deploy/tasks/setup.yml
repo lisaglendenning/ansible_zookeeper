@@ -1,0 +1,37 @@
+
+---
+
+- name: update apt cache
+  hosts: zookeeper
+  sudo: True
+  tasks:
+    - action: apt update_cache=yes
+      when_string: ${ansible_distribution} == 'Ubuntu'
+
+- name: install JRE
+  hosts: zookeeper
+  sudo: True
+  vars:
+    - java_version: 6
+#    - java_dist: null
+  tasks:
+    # because variable precedence/substition is annoying
+    - action: java state=jre version=${java_version}
+      only_if: is_unset('$java_dist')
+    - action: java state=jre version=${java_version} package_location=${java_dist}
+      only_if: is_set('$java_dist')
+      
+- name: create ZooKeeper user
+  hosts: zookeeper
+  sudo: True
+  vars_files:
+    - ../vars/deploy.yml
+    - ["../vars/deploy_${ansible_distribution}.yml",]
+  tasks:
+    - name: create zookeeper group ${zk_group}
+      action: group name=${zk_group} state=present system=yes
+  
+    - name: create zookeeper user ${zk_user}
+      action: user name=${zk_user} state=present group=${zk_group}
+        comment="ZooKeeper" system=yes shell=${nologin}
+        home=${zk_tree.vlb} createhome=no

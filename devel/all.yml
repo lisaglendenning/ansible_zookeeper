@@ -1,4 +1,4 @@
-# executes all devel tasks on all zookeeper_devel hosts
+# executes all devel tasks on zookeeper_devel hosts
 # to override default variables, create a vars/devel_site.yml file
 # NOTE: publish requires the following variables to be set:
 #   publish_user, publish_host, publish_path

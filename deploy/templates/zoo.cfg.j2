@@ -1,0 +1,65 @@
+{#- Jinja2 template -#}
+
+{%- macro print_value(k, v) %}
+{{ k ~ '=' ~ v }}
+{# for whitespacing #}
+{% endmacro -%}
+
+{%- macro print_server(id='', hostname='', 
+        clientPort='', leaderPort='', observer=false) %}
+server.{{- id|default('1', true) -}}:
+    {{- hostname|default('localhost', true) -}}:
+    {{- clientPort|default('2888', true) -}}:
+    {{- leaderPort|default('3888', true) -}}
+    {%- if observer -%}:observer{%- endif %}
+{% endmacro -%}
+
+{%- macro iterate_defaults(values, defaults) -%}
+    {%- for k,v in defaults|dictsort -%}
+        {%- if k not in values -%}
+            {{ caller(k, v) }}
+        {%- endif -%}
+    {%- endfor -%}
+    {%- for k,v in values|dictsort -%}
+        {{ caller(k, v) }}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro render(conf={}) -%}
+
+    {%- set conf_defaults = {
+        'dataDir': '/var/lib/zookeeper', 
+        'clientPort': 2181, 
+        'tickTime': 2000,}
+    -%}
+    
+    {%- call(k, v) iterate_defaults(conf, conf_defaults) %}
+{{ print_value(k, v) }}
+    {%- endcall -%}
+        
+    {%- if zk_ensemble -%}
+    
+        {%- set my_ensemble = groups[zk_ensemble] %}
+          
+        {%- if zk_observer -%}
+{{ print_value('peerType', 'observer') }}
+        {%- endif -%}
+        
+        {%- for host in my_ensemble|sort -%}
+            {%- set hostinfo = hostvars[host] %}
+{{ print_server(hostinfo['zk_id']|default(loop.index), 
+    hostinfo['zk_hostname']|default(host), 
+    hostinfo['zk_clientPort']|default(''), 
+    hostinfo['zk_leaderPort']|default(''),
+    hostinfo['zk_observer']|default(false)) }}
+{# for whitespacing #}
+        {%- endfor -%}
+    {%- endif -%}
+
+{%- endmacro -%}
+
+#
+# ZooKeeper configuration file
+#
+
+{{ render(zk_conf|default({})) }}

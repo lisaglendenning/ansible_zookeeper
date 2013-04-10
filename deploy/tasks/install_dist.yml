@@ -1,0 +1,54 @@
+---
+
+- name: fetch zookeeper and bigtop distributions
+  hosts: zookeeper
+  sudo: True
+  vars_files:
+    - ../vars/deploy.yml
+    - ["../vars/deploy_${ansible_distribution}.yml",]
+  tasks:
+
+    - include: 
+        > 
+          ../../common/tasks/apache_mirror_download.yml
+          pkg_name=${item.name} pkg_version=${item.version}
+          relative_url=${item.name}/${item.name}-${item.version}
+          file=${item.file} dest_dir=${zk_source_path} 
+          user=${zk_user} group=${zk_group}
+          source_dir=${dist_dir}
+      with_items:
+        - ${dists.zookeeper}
+        - ${dists.bigtop}
+
+- name: install zookeeper from distributions
+  hosts: zookeeper
+  sudo: True
+  vars_files:
+    - "../vars/deploy.yml"
+    - ["../vars/deploy_${ansible_distribution}.yml",]
+  tasks:
+
+    - name: install supporting packages
+      action: yum name=$item state=present
+      with_items: [coreutils, chkconfig]
+      when_string: $ansible_distribution == 'Fedora'
+    
+    - name: create zookeeper-owned directories
+      action: file path=${item} state=directory mode=0755 
+        owner=${zk_user} group=${zk_group}
+      with_items: ${zk_owned_dirs}
+    
+    # the bigtop install script will fail if run more than once
+    # so add a file to track if we've run it
+    - name: bigtop install_zookeeper.sh
+      action: shell chdir=${zk_source_path}/bigtop/bigtop-packages/src/common/zookeeper
+        [ -f ${zk_tree.etc}/zookeeper_installed ] ||
+        ./install_zookeeper.sh --build-dir=${zk_source_path}/${zk} 
+        --prefix=/${zk_prefix} ${install_zookeeper_sh_args} &&
+        touch ${zk_tree.etc}/zookeeper_installed
+  
+    - name: install conf directory
+      action: shell ${alternatives_cmd}
+        --install ${zk_tree.etc}/conf ${zk}-conf ${zk_tree.etc}/conf.dist 30
+  
+        

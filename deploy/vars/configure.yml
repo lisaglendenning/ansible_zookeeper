@@ -1,0 +1,11 @@
+---
+
+#zk_conf:
+  # the port to listen for client connections
+  #clientPort: 2181
+  
+  # basic time unit in milliseconds
+  #tickTime: 2000
+  
+  # location for in-memory database snapshots
+  #dataDir: ${zk_tree.vlb}

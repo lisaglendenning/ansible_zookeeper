@@ -1,0 +1,53 @@
+---
+
+- name: install libzookeeper
+  hosts: zookeeper_client
+  sudo: True
+  vars:
+    pkg_name: ${zk}-${zk_version}-lib-${ansible_machine}.tar.gz 
+    extracted: usr
+  vars_files:
+    - ../vars/deploy.yml
+    - ["../vars/deploy_${ansible_distribution}.yml",]
+  tasks:
+    - include: 
+        > 
+          ../../common/tasks/fetch.yml
+          file=${pkg_name}
+          user=${zk_user} group=${zk_group} source_dir=${dist_dir} 
+          dest_dir=${zk_source_path}
+    
+    - include: 
+        > 
+          ../../common/tasks/extract.yml
+          file=${pkg_name}
+          extracted=${extracted}
+          user=${zk_user} group=${zk_group}
+          dir=${zk_source_path}
+    
+    - action: shell install -m 775 -d ${item}
+      with_items:
+        - ${zk_tree.lib}
+        - ${zk_tree.lib}/bin
+        - ${zk_tree.lib}/include/zookeeper
+      
+    - action: shell chdir=${zk_source_path}/${extracted}
+        install -m 755 -t ${zk_tree.lib}/bin bin/*
+  
+    - action: shell chdir=${zk_source_path}/${extracted}
+        install -m 644 -t ${zk_tree.lib}/include/zookeeper include/zookeeper/*
+  
+    - action: shell chdir=${zk_source_path}/${extracted}
+        install -m 644 -t ${zk_tree.lib} lib/*.a
+  
+    - action: shell chdir=${zk_source_path}/${extracted}
+        install -m 755 -t ${zk_tree.lib} lib/*.la lib/*.so.?.?.?
+  
+    - action: shell chdir=${zk_source_path}/${extracted}
+        cp -d lib/libzookeeper_??.so ${zk_tree.lib}
+  
+    - action: shell chdir=${zk_source_path}/${extracted}
+        cp -d lib/libzookeeper_??.so.? ${zk_tree.lib}
+      
+    - action: shell /sbin/ldconfig ${zk_tree.lib}
+    

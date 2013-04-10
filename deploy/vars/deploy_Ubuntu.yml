@@ -1,0 +1,11 @@
+---
+
+initd_dir: /etc/init.d
+alternatives_cmd: update-alternatives
+nologin: /bin/false
+install_zookeeper_sh_args: ''
+chkconfig_cmd: update-rc.d
+chkconfig_opts: ''
+chkconfig_args: defaults
+zk_init_script: deb/zookeeper/zookeeper-server.init
+python_libdir: /usr/lib/python2.7/dist-packages
