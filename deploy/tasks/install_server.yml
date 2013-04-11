@@ -13,7 +13,7 @@
       when_set: ${zk_datalog_device}
       
     - name: mount zookeeper data log device
-      action: script files/zk_mount_log_device.py -v ${zk_tree.vlb}/datalog
+      action: script ../files/zk_mount_log_device.py -v ${zk_tree.vlb}/datalog
       when_set: ${zk_datalog_device}
       
 - name: install ZooKeeper server service from distributions

@@ -34,7 +34,7 @@
       when_string: $ansible_distribution == 'Fedora'
     
     - name: create zookeeper-owned directories
-      action: file path=${item} state=directory mode=0755 
+      action: file path=${item} state=directory mode=0775 
         owner=${zk_user} group=${zk_group}
       with_items: ${zk_owned_dirs}
     
