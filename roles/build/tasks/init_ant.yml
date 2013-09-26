@@ -19,7 +19,6 @@
 - name: set ANT_HOME
   lineinfile: state=present create=yes backup=yes insertafter=BOF
     dest={{ env_file }} line='ANT_HOME="{{ ant_home }}"' regexp='ANT_HOME='
-  when: extracted.changed
 
 - name: get ant task library dependencies
   shell: chdir={{ ant_install_prefix }}/{{ ant_pkg_name }}

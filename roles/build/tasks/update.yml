@@ -1,8 +1,29 @@
 ---
 
-- name: update ZooKeeper source
+- name: update ZK source
 #  command: chdir={{ zk_source_path }} {{ git_cmd }} pull
   git: repo={{ zk_git_repo }} dest={{ zk_source_path }} 
     remote={{ zk_git_remote }} version={{ zk_git_branch }} update=yes
-  notify:
-    - build ZK java release
+  register: zk_update
+    
+# I could not get this to work using sudo
+# ivy wants to put the .m2 directory in the wrong place
+- name: build ZK java release
+  command: chdir={{ zk_source_path }} {{ ant_cmd }} {{ zk_build_targets|join(' ') }}
+  when: zk_update.changed
+  
+- name: build ZK C client
+  command: chdir={{ zk_source_path }} {{ ant_cmd }} {{  zk_build_client_c_targets|join(' ') }}
+  when: zk_build_client_c and zk_update.changed
+      
+- name: add architecture to ZK C client library
+  file: path={{ zk_source_path }}/build/{{ zk }}-{{ zk_version }}-lib-{{ ansible_machine }}.tar.gz
+    src={{ zk_source_path }}/build/{{ zk }}-{{ zk_version }}-lib.tar.gz
+    state=link
+  when: zk_build_client_c and zk_update.changed
+      
+- name: build ZK python client
+  shell: chdir={{ zk_source_path }}/src/contrib/zkpython
+    {{ ant_cmd }} {{ zk_build_client_python_targets|join(' ') }}
+  when: zk_build_client_python and zk_update.changed
+    
