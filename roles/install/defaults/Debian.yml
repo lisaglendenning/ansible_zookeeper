@@ -1,0 +1,5 @@
+---
+
+alternatives_cmd: update-alternatives
+nologin: /bin/false
+install_zookeeper_sh_args: ''

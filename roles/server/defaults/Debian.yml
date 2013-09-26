@@ -1,0 +1,8 @@
+---
+
+initd_dir: /etc/init.d
+chkconfig_cmd: update-rc.d
+chkconfig_opts: ''
+chkconfig_args: defaults
+zk_init_script: deb/{{ zk }}/{{ zk }}-server.init
+python_libdir: /usr/lib/python2.7/dist-packages

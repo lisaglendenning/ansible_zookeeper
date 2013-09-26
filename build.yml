@@ -1,0 +1,36 @@
+
+---
+
+- hosts: build
+  name: Group build hosts by operating system
+  tags: init
+  tasks:
+    - group_by: key={{ ansible_os_family }}
+
+- hosts: build:&RedHat
+  tags: init
+  roles:
+    - { role: build }
+  tasks:
+    - include: roles/build/tasks/init_redhat.yml
+
+- hosts: build:&Debian
+  tags: init
+  roles:
+    - { role: build }
+  tasks:
+    - include: roles/build/tasks/init_debian.yml
+ 
+- hosts: build
+  tags: init
+  roles:
+    - { role: build }
+  tasks:
+    - include: roles/build/tasks/init.yml
+ 
+- hosts: build
+  tags: update
+  roles:
+    - { role: build }
+  tasks:
+    - include: roles/build/tasks/update.yml

@@ -1,0 +1,16 @@
+---
+
+- name: install server packages
+  yum: name={{ item }} state=present
+  with_items: [initscripts, "redhat-lsb"]
+  when: ansible_os_family == 'RedHat'
+  
+- name: install {{ zk_service }} init script
+  shell: creates={{ zk_prefix }}/{{ initd_dir }}/{{ zk_service }}
+    install -o root -g root -m 0755 -C
+    {{ zk_source_path }}/bigtop/bigtop-packages/src/{{ zk_init_script }}
+    {{ zk_prefix }}/{{ initd_dir }}/{{ zk_service }}
+  
+- name: install {{ zk_service }}
+  shell: >
+    {{ chkconfig_cmd }} {{ chkconfig_opts }} {{ zk_service }} {{ chkconfig_args }}

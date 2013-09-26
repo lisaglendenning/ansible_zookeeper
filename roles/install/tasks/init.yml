@@ -1,0 +1,18 @@
+
+---
+
+- name: install JRE
+  java: state=jre
+
+- name: create ZK group {{ zk_group }}
+  group: name={{ zk_group }} state=present system=yes
+  
+- name: create ZK user {{ zk_user }}
+  user: name={{ zk_user }} state=present group={{ zk_group }}
+    comment="ZooKeeper" system=yes shell={{ nologin }}
+    home={{ zk_tree.vlb }} createhome=no
+
+- name: create ZK-owned directories
+  action: file path={{ item }} state=directory mode=0775 
+    owner={{ zk_user }} group={{ zk_group }}
+  with_items: "{{ zk_owned_dirs }}"

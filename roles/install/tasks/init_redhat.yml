@@ -1,0 +1,10 @@
+
+---
+
+- name: install required packages
+  yum: name={{ item }} state=present
+  with_items:
+    - wget
+    - tar
+    - coreutils
+    - chkconfig

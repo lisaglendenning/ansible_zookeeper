@@ -1,0 +1,11 @@
+---
+
+- hosts: zookeeper_server
+  tags: 
+    - init
+  roles:
+    - { role: server }
+  vars_files:
+    - "roles/server/defaults/{{ ansible_os_family }}.yml"
+  tasks:
+    - include: roles/server/tasks/init.yml

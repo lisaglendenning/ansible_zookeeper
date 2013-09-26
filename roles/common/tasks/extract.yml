@@ -1,0 +1,22 @@
+# requirements: 
+#   tar
+#   sudo
+# parameters:
+#   expected
+#   dir
+#   file
+#   user
+#   symlink
+
+---
+
+- name: extract {{ file }}
+  shell: chdir={{ dir }} creates={{ dir }}/{{ expected }}
+    sudo -u {{ user }} tar xzf {{ file }}
+  when: file.endswith('.tar.gz')
+  register: extracted
+  
+- name: symbolic link {{ expected }}
+  file: path={{ dir }}/{{ symlink }} src={{ dir }}/{{ expected }}
+    state=link owner={{ user }}
+  when: symlink is defined

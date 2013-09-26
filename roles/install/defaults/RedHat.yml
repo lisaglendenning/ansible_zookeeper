@@ -1,0 +1,5 @@
+---
+
+alternatives_cmd: alternatives
+nologin: /sbin/nologin
+install_zookeeper_sh_args: --doc-dir=/usr/share/doc/{{ zk }}-{{ zk_version }}

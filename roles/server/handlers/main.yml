@@ -1,0 +1,25 @@
+---
+
+- name: initialize zookeeper-server
+  shell: service {{ zk_service }} init
+  ignore_errors: yes
+  notify: 
+    - zookeeper-server id file
+    - start zookeeper-server
+  
+- name: zookeeper-server id file
+  template: src=myid.j2 dest={{ zk_tree.vlb }}/myid
+    mode=0644 owner={{ zk_user }} group={{ zk_group }} backup=yes
+  notify: start zookeeper-server
+  
+- name: start zookeeper-server
+  service: name={{ zk_service }} state=started enabled=yes
+  notify: check zookeeper-server status
+  
+- name: restart zookeeper-server
+  service: name={{ zk_service }} state=restarted
+  
+# shell: service {{ zk_service }} start
+  
+- name: check zookeeper-server status
+  shell: service {{ zk_service }} status

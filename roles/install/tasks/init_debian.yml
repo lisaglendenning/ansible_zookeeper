@@ -1,0 +1,8 @@
+
+---
+
+- name: install required packages
+  apt: pkg={{ item }} state=present
+  with_items:
+    - wget
+    - tar

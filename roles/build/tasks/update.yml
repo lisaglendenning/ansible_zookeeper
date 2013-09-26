@@ -1,0 +1,8 @@
+---
+
+- name: update ZooKeeper source
+#  command: chdir={{ zk_source_path }} {{ git_cmd }} pull
+  git: repo={{ zk_git_repo }} dest={{ zk_source_path }} 
+    remote={{ zk_git_remote }} version={{ zk_git_branch }} update=yes
+  notify:
+    - build ZK java release

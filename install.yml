@@ -1,0 +1,45 @@
+---
+
+- hosts: zookeeper
+  name: Group zookeeper hosts by operating system
+  tags: 
+    - init
+    - update
+  tasks:
+  - action: group_by key={{ ansible_os_family }}
+
+- hosts: zookeeper:&RedHat
+  tags: 
+    - init
+  roles:
+    - { role: install }
+  tasks:
+    - include: roles/install/tasks/init_redhat.yml
+
+- hosts: zookeeper:&Debian
+  tags: 
+    - init
+  roles:
+    - { role: install }
+  tasks:
+    - include: roles/install/tasks/init_debian.yml
+
+- hosts: zookeeper
+  tags: 
+    - init
+  roles:
+    - { role: install }
+  vars_files:
+    - "roles/install/defaults/{{ ansible_os_family }}.yml"
+  tasks:
+    - include: roles/install/tasks/init.yml
+
+- hosts: zookeeper
+  tags: 
+    - update
+  roles:
+    - { role: install }
+  vars_files:
+    - "roles/install/defaults/{{ ansible_os_family }}.yml"
+  tasks:
+    - include: roles/install/tasks/install.yml

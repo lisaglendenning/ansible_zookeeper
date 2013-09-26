@@ -1,0 +1,27 @@
+
+---
+
+- name: install system packages for building
+  apt: pkg={{ item }} state=present
+  with_items:
+    - wget
+    - tar
+    - rsync
+    - git
+    # I think the following are needed for the tar target
+    - libtool
+    - automake
+    - libcppunit-dev
+
+- name: install packages for building C client
+  apt: pkg={{ item }} state=present
+  with_items:
+    - make
+  when: zk_build_client_c
+
+- name: install packages for building python client
+  apt: pkg={{ item }} state=present
+  with_items:
+    - python-dev
+    - python-setuptools
+  when: zk_build_client_python

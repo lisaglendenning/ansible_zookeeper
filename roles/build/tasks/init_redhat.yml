@@ -1,0 +1,27 @@
+
+---
+
+- name: install system packages for building
+  yum: name={{ item }} state=present
+  with_items:
+    - wget
+    - tar
+    - rsync
+    - git
+    # I think the following are needed for the tar target
+    - libtool
+    - automake
+    - cppunit-devel
+
+- name: install packages for building C client
+  yum: name={{ item }} state=present
+  with_items:
+    - make
+  when: zk_build_client_c
+
+- name: install packages for building python client
+  yum: name={{ item }} state=present
+  with_items:
+    - python-devel
+    - python-setuptools
+  when: zk_build_client_python

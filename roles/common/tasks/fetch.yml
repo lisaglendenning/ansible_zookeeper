@@ -1,0 +1,26 @@
+# requirements: rsync 
+#
+# parameters:
+#   dest_dir
+#   file
+#   user
+#   group
+#   source_dir or source_url
+
+---
+
+- name: create destination directory {{ dest_dir }}
+  file: path={{ dest_dir }} state=directory mode=0755
+    owner={{ user }} group={{ group }}
+
+- name: check for filesystem source {{ source_dir }}
+  shell: "if [ -f {{ source_dir }}/{{ file }} ]; then rsync -q {{ source_dir }}/{{ file }} {{ dest_dir }}; fi"
+  when: source_dir is defined
+  
+- name: check for http source {{ source_url }}
+  get_url: url={{ source_url }}/{{ file }} dest={{ dest_dir }}/{{ file }} thirsty=no
+  when: source_url is defined
+ 
+- name: fix permissions
+  file: name={{ dest_dir }}/{{ file }} mode=0644
+    owner={{ user }} group={{ group }}

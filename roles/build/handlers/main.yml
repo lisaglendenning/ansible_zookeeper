@@ -1,0 +1,29 @@
+---
+
+# I could not get this to work using sudo
+# ivy wants to put the .m2 directory in the wrong place
+- name: build ZK java release
+  command: chdir={{ zk_source_path }} {{ ant_cmd }} {{ item }}
+  with_items: zk_build_targets
+  notify: 
+    - build ZK C client
+    - build ZK python client
+  
+- name: build ZK C client
+  command: chdir={{ zk_source_path }} {{ ant_cmd }} {{ item }}
+  with_items: zk_build_client_c_targets
+  when: zk_build_client_c
+  notify:
+    - add architecture to ZK C client library
+      
+- name: add architecture to ZK C client library
+  file: path={{ zk_source_path }}/build/{{ zk }}-{{ zk_version }}-lib-{{ ansible_machine }}.tar.gz
+    src={{ zk_source_path }}/build/{{ zk }}-{{ zk_version }}-lib.tar.gz
+    state=link
+  when: zk_build_client_c
+      
+- name: build ZK python client
+  shell: chdir={{ zk_source_path }}/src/contrib/zkpython
+    {{ ant_cmd }} {{ item }}
+  with_items: zk_build_client_python_targets
+  when: zk_build_client_python

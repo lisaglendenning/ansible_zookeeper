@@ -1,0 +1,22 @@
+# requirements: init_debian.yml and init_redhat.yml
+
+---
+
+- name: install JDK
+  java: state=jdk
+
+# The ant packages require OpenJDK, overwriting our hard work to install Oracle Java!
+- include: init_ant.yml
+
+- name: create ZooKeeper source directory
+  file: path={{ zk_source_path }} state=directory mode=0755
+    owner={{ zk_build_user }} group={{ zk_build_group }}
+  
+# this will hang if SSH asks about the host key
+- name: clone ZooKeeper source
+  shell: creates={{ zk_source_path }}/.git
+    sudo -H -n -u {{ zk_build_user}} -i {{ git_cmd }} clone 
+    -o {{ zk_git_remote }} -b {{ zk_git_branch }} 
+    {{ zk_git_repo }} {{ zk_source_path }}
+  notify:
+    - build ZK java release

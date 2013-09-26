@@ -1,0 +1,37 @@
+# parameters:
+#   user
+#   group
+#   pkg_name
+#   pkg_version
+#   file
+#   source_dir
+#   dest_dir
+#   relative_url
+
+---
+
+- name: check if apache package downloaded
+  shell: if [ -e {{ dest_dir }}/{{ file }} ]; then echo "true"; fi
+  register: apache_package_downloaded
+  changed_when: not apache_package_downloaded.stdout
+  
+- name: query apache mirrors
+  get_url: url=http://www.apache.org/dyn/closer.cgi
+    dest=/tmp/apache_mirror.html thirsty=yes
+  when: apache_package_downloaded.changed
+        
+- name: scrape apache mirror url
+  shell: sed -nr 's%^\s*<p><a href="(.+)"><strong>.+</strong></a>\s*</p>\s*$%\1%p'
+    /tmp/apache_mirror.html | tr -d '\n'
+  register: apache_mirror
+  when: apache_package_downloaded.changed
+      
+- include: fetch.yml
+    source_url={{ apache_mirror.stdout }}/{{ relative_url }}
+  when: apache_package_downloaded.changed
+
+- include: extract.yml
+    dir={{ dest_dir }}
+    expected={{ pkg_name }}-{{ pkg_version }}
+    symlink={{ pkg_name }}
+      

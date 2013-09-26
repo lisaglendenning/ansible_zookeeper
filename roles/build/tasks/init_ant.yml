@@ -1,0 +1,27 @@
+# requirements: JDK
+
+---
+
+- name: check for jdk
+  shell: which javac
+  changed_when: false
+      
+- include: ../../common/tasks/apache_mirror_download.yml
+  vars:
+      pkg_name: "{{ ant_pkg_name }}"
+      pkg_version: "{{ ant_version }}"
+      file: "{{ ant_pkg_name }}-{{ ant_version }}-bin.tar.gz"
+      dest_dir: "{{ ant_install_prefix }}"
+      relative_url: "{{ ant_url_path }}"
+      user: root 
+      group: root
+
+- name: set ANT_HOME
+  lineinfile: state=present create=yes backup=yes insertafter=BOF
+    dest={{ env_file }} line='ANT_HOME="{{ ant_home }}"' regexp='ANT_HOME='
+  when: extracted.changed
+
+- name: get ant task library dependencies
+  shell: chdir={{ ant_install_prefix }}/{{ ant_pkg_name }}
+    . {{ env_file }} && bin/ant -f fetch.xml -Ddest=system
+  when: extracted.changed

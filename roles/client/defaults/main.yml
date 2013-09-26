@@ -1,0 +1,4 @@
+---
+
+zk_client_c_package: "{{ zk }}-{{ zk_version }}-lib-{{ ansible_machine }}.tar.gz"
+zk_client_python_package: "ZooKeeper-0.4.linux-{{ ansible_machine }}.tar.gz"

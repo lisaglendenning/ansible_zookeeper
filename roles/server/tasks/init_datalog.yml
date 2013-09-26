@@ -1,0 +1,17 @@
+---
+
+- name: create ZK data log mount point
+  file: path={{ zk_tree.vlb }}/datalog state=directory mode=0755 
+    owner={{ zk_user }} group={{ zk_group }}
+
+- action: datalog_device.py
+  args: { device: $zk_datalog_device, devices: $ansible_devices }
+  register: datalog_device_result
+
+- file: path={{ datalog_device_result.device }} owner=root group=root
+
+- filesystem: fstype=ext3 dev={{ datalog_device_result.device }} force=no
+
+- mount: name={{ zk_tree.vlb }}/datalog fstype=ext3 
+    opts=rw,auto,user,async src={{ datalog_device_result.device }}
+    state=mounted 

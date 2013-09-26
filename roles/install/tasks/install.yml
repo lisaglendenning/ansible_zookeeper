@@ -1,0 +1,37 @@
+---
+
+# fetch zookeeper and bigtop distributions
+- include: ../../common/tasks/apache_mirror_download.yml
+    pkg_name={{ item.name }}
+    pkg_version={{ item.version }}
+    relative_url={{ item.name }}/{{ item.name }}-{{ item.version }}
+    file={{ item.file }}
+    dest_dir={{ zk_source_path }}
+    user={{ zk_user }}
+    group={{ zk_group }}
+  with_items:
+    - { name: "bigtop", version: "{{ bigtop_version }}", file: "{{ bigtop_package }}" }
+    - { name: "{{ zk }}", version: "{{ zk_version }}", file: "{{ zk_java_package }}" }
+
+# install bigtop_utils
+
+- file: path={{ bigtop_utils_prefix }} state=directory mode=0755 owner=root group=root
+
+- shell: install -o root -g root -m 0755 -C -t {{ bigtop_utils_prefix }}
+    {{ zk_source_path }}/bigtop/bigtop-packages/src/common/bigtop-utils/bigtop*
+  
+# install zookeeper from distributions
+
+# the bigtop install script will fail if run more than once
+# so add a file to track if we've run it
+- name: bigtop install_zookeeper.sh
+  shell: chdir={{ zk_source_path }}/bigtop/bigtop-packages/src/common/zookeeper
+    creates={{ zk_source_path }}/zookeeper_installed
+    ./install_zookeeper.sh --build-dir={{ zk_source_path }}/{{ zk }} 
+    --prefix=/{{ zk_prefix }} {{ install_zookeeper_sh_args }} &&
+    touch {{ zk_source_path }}/zookeeper_installed
+
+- name: install conf directory
+  shell: creates={{ zk_tree.etc }}/conf {{ alternatives_cmd }}
+    --install {{ zk_tree.etc }}/conf {{ zk }}-conf {{ zk_tree.etc }}/conf.dist 30
+        

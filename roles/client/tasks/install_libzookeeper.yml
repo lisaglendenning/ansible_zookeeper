@@ -1,0 +1,35 @@
+---
+
+- include: ../../common/tasks/extract.yml
+      file={{ zk_client_c_package }}
+      expected=usr
+      user={{ zk_user }} 
+      group={{ zk_group }}
+      dir={{ zk_source_path }}
+
+- shell: install -m 775 -d {{ item }}
+  with_items:
+    - "{{ zk_tree.lib }}"
+    - "{{ zk_tree.lib }}/bin"
+    - "{{ zk_tree.lib }}/include/zookeeper"
+  
+- shell: chdir={{ zk_source_path }}/usr
+    install -m 755 -C -t {{ zk_tree.lib }}/bin bin/*
+
+- shell: chdir={{ zk_source_path }}/usr
+    install -m 644 -C -t {{ zk_tree.lib }}/include/zookeeper include/zookeeper/*
+
+- shell: chdir={{ zk_source_path }}/usr
+    install -m 644 -C -t {{ zk_tree.lib }} lib/*.a
+
+- shell: chdir={{ zk_source_path }}/usr
+    install -m 755 -C -t {{ zk_tree.lib }} lib/*.la lib/*.so.?.?.?
+
+- shell: chdir={{ zk_source_path }}/usr
+    cp -d lib/libzookeeper_??.so {{ zk_tree.lib }}
+
+- shell: chdir={{ zk_source_path }}/usr
+    cp -d lib/libzookeeper_??.so.? {{ zk_tree.lib }}
+    
+- shell: /sbin/ldconfig {{ zk_tree.lib }}
+    

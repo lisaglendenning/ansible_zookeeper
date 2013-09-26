@@ -1,0 +1,7 @@
+
+---
+
+- include: build.yml
+- include: install.yml
+- include: servers.yml
+- include: clients.yml

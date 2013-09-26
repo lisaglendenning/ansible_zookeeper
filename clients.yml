@@ -1,0 +1,11 @@
+---
+
+- hosts: zookeeper_client
+  tags: 
+    - init
+  roles:
+    - { role: client }
+  vars_files:
+    - "roles/client/defaults/{{ ansible_os_family }}.yml"
+  tasks:
+    - include: roles/client/tasks/install.yml
