@@ -7,6 +7,7 @@
     relative_url={{ item.name }}/{{ item.name }}-{{ item.version }}
     file={{ item.file }}
     dest_dir={{ zk_source_path }}
+    user=root group=root
   with_items:
     - { name: "bigtop", version: "{{ bigtop_version }}", file: "{{ bigtop_package }}" }
     - { name: "{{ zk }}", version: "{{ zk_version }}", file: "{{ zk_java_package }}" }
