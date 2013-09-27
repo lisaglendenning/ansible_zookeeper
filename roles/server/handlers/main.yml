@@ -18,7 +18,7 @@
   
 - name: zookeeper-service id file
   template: src=myid.j2 dest={{ zk_tree.vlb }}/myid
-    mode=0644 owner={{ zk_user }} group={{ zk_group }} backup=yes
+    mode=0644 owner={{ zk_user }} group={{ zk_group }} backup=no
   notify: start zookeeper-service
   
 - name: start zookeeper-service

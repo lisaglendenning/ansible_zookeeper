@@ -15,7 +15,7 @@ parameters:
 
 {%- macro print_server(id='', hostname='', 
         clientPort='', leaderPort='', observer=false) %}
-server.{{- id|default('1', true) -}}:
+server.{{- id|default('1', true) -}}=
     {{- hostname|default('localhost', true) -}}:
     {{- clientPort|default('2888', true) -}}:
     {{- leaderPort|default('3888', true) -}}
