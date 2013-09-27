@@ -9,3 +9,13 @@
     - "roles/server/defaults/{{ ansible_os_family }}.yml"
   tasks:
     - include: roles/server/tasks/init.yml
+
+- hosts: zookeeper_server
+  tags: 
+    - update
+  roles:
+    - { role: server }
+  vars_files:
+    - "roles/server/defaults/{{ ansible_os_family }}.yml"
+  tasks:
+    - include: roles/server/tasks/update.yml

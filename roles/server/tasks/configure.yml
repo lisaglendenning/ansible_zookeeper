@@ -3,10 +3,10 @@
 - name: zookeeper-server java environment
   template: src=java.env.j2 dest={{ zk_tree.etc }}/conf/java.env
     mode=0644 owner={{ zk_user }} group={{ zk_group }} backup=yes
-  notify: initialize zookeeper-server
+  notify: zookeeper-service
 
 - name: zookeeper-server config file
   template: src=zoo.cfg.j2 dest={{ zk_tree.etc }}/conf/zoo.cfg 
     mode=0644 owner={{ zk_user }} group={{ zk_group }} backup=yes
-  notify: initialize zookeeper-server
+  notify: zookeeper-service
   
