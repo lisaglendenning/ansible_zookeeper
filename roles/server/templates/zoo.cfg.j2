@@ -1,5 +1,13 @@
 {#- Jinja2 template -#}
 
+{#- 
+
+parameters: 
+  zk_conf: {} (optional)
+  zk_ensemble: string (optional)
+  
+-#}
+
 {%- macro print_value(k, v) %}
 {{ k ~ '=' ~ v }}
 {# for whitespacing #}
@@ -25,7 +33,7 @@ server.{{- id|default('1', true) -}}:
     {%- endfor -%}
 {%- endmacro -%}
 
-{%- macro render(conf={}) -%}
+{%- macro print_conf(conf={}) -%}
 
     {%- set conf_defaults = {
         'syncLimit': 5,
@@ -38,25 +46,26 @@ server.{{- id|default('1', true) -}}:
     {%- call(k, v) iterate_defaults(conf, conf_defaults) %}
 {{ print_value(k, v) }}
     {%- endcall -%}
-        
-    {%- if zk_ensemble is defined -%}
     
-        {%- set my_ensemble = groups[zk_ensemble] %}
+{%- endmacro -%}
+
+{%- macro print_ensemble(group) -%}
+    {%- set ensemble = groups[group] -%}
           
-        {%- if zk_observer is defined -%}
+    {%- if zk_observer is defined -%}
 {{ print_value('peerType', 'observer') }}
-        {%- endif -%}
-        
-        {%- for host in my_ensemble|sort -%}
-            {%- set hostinfo = hostvars[host] %}
-{{ print_server(hostinfo['zk_id']|default(loop.index), 
-    hostinfo['zk_hostname']|default(host), 
-    hostinfo['zk_clientPort']|default(''), 
-    hostinfo['zk_leaderPort']|default(''),
-    hostinfo['zk_observer']|default(false)) }}
-{# for whitespacing #}
-        {%- endfor -%}
     {%- endif -%}
+        
+    {%- for host in ensemble|sort -%}
+        {%- set hostinfo = hostvars[host] %}
+        {%- set serverinfo = hostinfo.get('ansible_local', {}).get('zookeeper', {}).get('server', {}) -%}
+{{ print_server(hostinfo['zk_id']|default(serverinfo['id'])|default(loop.index), 
+    hostinfo['zk_hostname']|default(serverinfo['hostname'])|default(host), 
+    hostinfo['zk_clientPort']|default(serverinfo['clientPort'])|default(''), 
+    hostinfo['zk_leaderPort']|default(serverinfo['leaderPort'])|default(''),
+    hostinfo['zk_observer']|default(serverinfo['observer'])|default(false)) }}
+{# for whitespacing #}
+    {%- endfor -%}
 
 {%- endmacro -%}
 
@@ -64,4 +73,13 @@ server.{{- id|default('1', true) -}}:
 # ZooKeeper configuration file
 #
 
-{{ render(zk_conf|default({})) }}
+{{ print_conf(zk_conf|default({})) }}
+{%- if zk_ensemble is defined %}
+{{ print_ensemble(zk_ensemble) }}
+{% else -%}
+    {%- for group in group_names -%}
+        {%- if 'ensemble' in group %}
+{{ print_ensemble(group) }}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endif -%}

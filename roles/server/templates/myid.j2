@@ -1,26 +1,37 @@
 {#- Jinja2 template -#}
 
+{#- 
+
+parameters: 
+  zk_id: int (optional)
+  zk_ensemble: string (optional)
+
+-#}
+
 {%- macro print_id(id) -%}
 {{ id }}
 {%- endmacro -%}
 
-{%- set id = zk_id -%}
-{%- if id is defined -%}
-    {{- print_id(id) -}}
+{%- macro group_id(group) -%}
+    {%- for host in groups[group]|sort -%}
+        {%- if inventory_hostname == host -%} 
+            {{- print_id(loop.index) -}}
+        {%- endif -%}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{%- if zk_id is defined -%}
+    {{- print_id(zk_id) -}}
+{%- elif ansible_local.get('zookeeper', {}).get('server', {})['id'] is defined -%}
+    {{- print_id(ansible_local.get('zookeeper', {}).get('server', {})['id']) -}}
 {%- else -%}
-    {%- set hostname = inventory_hostname|default('') -%}
-    {%- set ensemble = zk_ensemble|default(()) -%}
-    {%- set ensembles = groups|default(()) -%}
-    {%- if ensembles and ensemble and ensemble in ensembles -%}
-        {%- set ensemble = ensembles[ensemble] -%}
-    {%- endif -%}
-    {%- if hostname and hostname in ensemble -%}
-        {%- for host in ensemble|sort -%}
-            {%- if hostname == host -%} 
-                {{- print_id(loop.index) -}}
+    {%- if zk_ensemble is defined %}
+        {{- group_id(zk_ensemble) }}
+    {% else -%}
+        {%- for group in group_names -%}
+            {%- if 'ensemble' in group %}
+                {{- group_id(group) -}}
             {%- endif -%}
         {%- endfor -%}
-    {%- else -%}
-        {{- print_id(1) -}}
     {%- endif -%}
 {%- endif -%}
