@@ -13,13 +13,13 @@ parameters:
 {# for whitespacing #}
 {% endmacro -%}
 
-{%- macro print_server(id='', hostname='', 
-        clientPort='', leaderPort='', observer=false) %}
-server.{{- id|default('1', true) -}}=
-    {{- hostname|default('localhost', true) -}}:
-    {{- clientPort|default('2888', true) -}}:
-    {{- leaderPort|default('3888', true) -}}
-    {%- if observer -%}:observer{%- endif %}
+{%- macro print_server(id, hostname='', 
+        leaderPort='', electionPort='3888', observer=false) %}
+server.{{ id|default('1', true) }}=
+    {%- if hostname %}{{ hostname }}{% endif -%}
+    :{{ leaderPort|default('2888', true) -}}
+    {%- if electionPort %}:{{ electionPort }}{% endif -%}
+    {%- if observer %}:observer{% endif %}
 {% endmacro -%}
 
 {%- macro iterate_defaults(values, defaults) -%}
@@ -61,8 +61,8 @@ server.{{- id|default('1', true) -}}=
         {%- set serverinfo = hostinfo.get('ansible_local', {}).get('zookeeper', {}).get('server', {}) -%}
 {{ print_server(hostinfo['zk_id']|default(serverinfo['id'])|default(loop.index), 
     hostinfo['zk_hostname']|default(serverinfo['hostname'])|default(host), 
-    hostinfo['zk_clientPort']|default(serverinfo['clientPort'])|default(''), 
-    hostinfo['zk_leaderPort']|default(serverinfo['leaderPort'])|default(''),
+    hostinfo['zk_leaderPort']|default(serverinfo['leaderPort'])|default(''), 
+    hostinfo['zk_electionPort']|default(serverinfo['electionPort'])|default('3888'),
     hostinfo['zk_observer']|default(serverinfo['observer'])|default(false)) }}
 {# for whitespacing #}
     {%- endfor -%}
