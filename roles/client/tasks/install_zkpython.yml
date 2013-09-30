@@ -7,7 +7,7 @@
 # this probably has to do with the distribution I built on?
 # So, I'm just gonna grep the package to see which it is...
 # ...and hope it doesn't matter...
-- shell: chdir={{ zk_source_path }}
+- shell: chdir={{ zk_release_path }}
     tar tzf {{ zk_client_python_package }} | grep -E 'packages/$' | sed 's/.//'
   register: lib_path
     
@@ -16,7 +16,7 @@
       expected={{ lib_path.stdout }}/zookeeper.so
       user={{ zk_user }} 
       group={{ zk_group }}
-      dir={{ zk_source_path }}
+      dir={{ zk_release_path }}
       
 - shell: install -m 755 -C -t {{ python_libdir }} 
-    {{ zk_source_path }}/{{ lib_path.stdout }}/*
+    {{ zk_release_path }}/{{ lib_path.stdout }}/*

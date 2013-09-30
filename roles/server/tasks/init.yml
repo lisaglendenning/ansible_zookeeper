@@ -11,7 +11,7 @@
 - name: install {{ zk_service }} init script
   shell: creates={{ zk_prefix }}/{{ initd_dir }}/{{ zk_service }}
     install -o root -g root -m 0755 -C
-    {{ zk_source_path }}/bigtop/bigtop-packages/src/{{ zk_init_script }}
+    {{ zk_release_path }}/bigtop/bigtop-packages/src/{{ zk_init_script }}
     {{ zk_prefix }}/{{ initd_dir }}/{{ zk_service }}
   
 - name: install {{ zk_service }}

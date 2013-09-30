@@ -3,9 +3,7 @@
 zk_user: "{{ zk }}"
 zk_group: "{{ zk }}"
 
-zk_prefix: ''
-
-zk_source_path: "{{ zk_prefix }}/usr/share/zookeeper"
+zk_prefix: ""
 
 zk_tree:
   vlb: "{{ zk_prefix }}/var/lib/{{ zk }}"
@@ -15,6 +13,8 @@ zk_tree:
   bin: "{{ zk_prefix }}/usr/bin"
   lib: "{{ zk_prefix }}/usr/lib/{{ zk }}"
 
+zk_release_path: "{{ zk_tree.lib }}"
+
 bigtop_version: 0.6.0
 bigtop_utils_prefix: /usr/lib/bigtop-utils
 
@@ -23,7 +23,6 @@ zk_owned_dirs:
   - "{{ zk_tree.vlb }}"
   - "{{ zk_tree.log }}"
   - "{{ zk_tree.run }}"
-
 
 zk_java_package: "{{ zk }}-{{ zk_version }}.tar.gz"
 bigtop_package: "bigtop-{{ bigtop_version }}-project.tar.gz"
