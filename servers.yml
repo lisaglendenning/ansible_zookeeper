@@ -1,6 +1,6 @@
 ---
 
-- hosts: zookeeper_server
+- hosts: servers
   tags: 
     - init
   roles:
@@ -10,7 +10,7 @@
   tasks:
     - include: roles/server/tasks/init.yml
 
-- hosts: zookeeper_server
+- hosts: servers
   tags: 
     - update
   roles:

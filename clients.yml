@@ -1,6 +1,6 @@
 ---
 
-- hosts: zookeeper_client
+- hosts: clients
   tags: 
     - init
   roles:
