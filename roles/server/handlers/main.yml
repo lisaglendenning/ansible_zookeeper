@@ -28,11 +28,11 @@
   notify: start zookeeper-service
   
 - name: start zookeeper-service
-  service: name={{ zk_service }} state=started enabled=yes
+  command: service {{ zk_service }} start
   notify: check zookeeper-service status
   
 - name: restart zookeeper-service
-  service: name={{ zk_service }} state=restarted
+  command: service {{ zk_service }} restart
   when: zookeeper_service_status|success
   notify: check zookeeper-service status
 
