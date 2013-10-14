@@ -1,5 +1,9 @@
 ---
 
+- name: load zookeeper-service
+  shell: >
+    {{ chkconfig_cmd }} {{ chkconfig_opts }} {{ zk_service }} {{ chkconfig_args }}
+    
 - name: zookeeper-service
   command: service {{ zk_service }} status
   ignore_errors: yes
