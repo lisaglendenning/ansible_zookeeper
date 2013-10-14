@@ -1,11 +1,17 @@
 ---
 
 - name: update ZK source
-#  command: chdir={{ zk_source_path }} {{ git_cmd }} pull
   git: repo={{ zk_git_repo }} dest={{ zk_source_path }} 
     remote={{ zk_git_remote }} version={{ zk_git_branch }} update=yes
+  when: zk_update is not defined or not zk_update.changed
   register: zk_update
-    
+
+- name: check for fresh clone
+  shell: chdir={{ zk_source_path }} if [ -d build ]; then echo "false"; else echo "true"; fi
+  register: zk_update
+  changed_when: zk_update.stdout == 'true'
+  when: not zk_update.changed
+  
 # I could not get this to work using sudo
 # ivy wants to put the .m2 directory in the wrong place
 - name: build ZK java release

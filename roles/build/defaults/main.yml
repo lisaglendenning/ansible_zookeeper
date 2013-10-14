@@ -23,17 +23,3 @@ zk_build_client_c: false
 zk_build_client_c_targets: [package-native]
 zk_build_client_python: false
 zk_build_client_python_targets: [tar-bin]
-
-# for publishing
-zk_build_path: "{{ zk_source_path }}/build"
-zk_release_artifacts:
-  - "{{ zk }}-{{ zk_version }}.tar.gz"
-zk_client_c_artifacts:
-  - "{{ zk }}-{{ zk_version }}-lib-i686.tar.gz"
-  - "{{ zk }}-{{ zk_version }}-lib-x86_64.tar.gz"
-zk_client_python_artifacts:
-  - contrib/zkpython/dist/ZooKeeper-0.4.linux-i686.tar.gz
-  - contrib/zkpython/dist/ZooKeeper-0.4.linux-x86_64.tar.gz
-# zk_publish_user
-# zk_publish_host
-# zk_publish_path

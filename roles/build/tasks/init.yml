@@ -18,5 +18,4 @@
     sudo -H -n -u {{ zk_build_user}} -i {{ git_cmd }} clone 
     -o {{ zk_git_remote }} -b {{ zk_git_branch }} 
     {{ zk_git_repo }} {{ zk_source_path }}
-  notify:
-    - build ZK java release
+  register: zk_update

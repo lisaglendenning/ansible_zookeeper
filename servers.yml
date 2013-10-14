@@ -18,4 +18,4 @@
   vars_files:
     - "roles/server/defaults/{{ ansible_os_family }}.yml"
   tasks:
-    - include: roles/server/tasks/update.yml
+    - include: roles/server/tasks/configure.yml

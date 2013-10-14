@@ -3,7 +3,7 @@
 - include: init_datalog.yml
   when: zk_datalog_device is defined
 
-- name: install server packages
+- name: install service packages
   yum: name={{ item }} state=present
   with_items: [initscripts, "redhat-lsb"]
   when: ansible_os_family == 'RedHat'

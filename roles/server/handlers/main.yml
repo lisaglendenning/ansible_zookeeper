@@ -7,15 +7,17 @@
   notify:
     - initialize zookeeper-service
     - restart zookeeper-service
-   
+
+# Because sudo doesn't work for my development platform
+# so the permissions are screwy
 - name: initialize zookeeper-service
-  shell: service {{ zk_service }} init
+  shell: service {{ zk_service }} init; chown -R {{ zk_user }}:{{ zk_group }} {{ zk_tree.vlb }}
   ignore_errors: yes
   when: zookeeper_service_status|failed
-  notify: 
+  notify:
     - zookeeper-service id file
     - start zookeeper-service
-  
+
 - name: zookeeper-service id file
   template: src=myid.j2 dest={{ zk_tree.vlb }}/myid
     mode=0644 owner={{ zk_user }} group={{ zk_group }} backup=no
