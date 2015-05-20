@@ -1,0 +1,41 @@
+{#- Jinja2 template -#}
+
+{%- macro print_server(address, id='', clientPort='',
+        leaderPort='', electionPort='', 
+        clientPortAddress='', role='') -%}
+server.{{ id|default('1', true) }}={{ address }}:
+    {{- leaderPort|default('2888', true) }}:
+    {{- electionPort|default('3888', true) }}
+    {%- if role %}:{{ role }}{% endif %};
+    {%- if clientPortAddress %}{{ clientPortAddress }}:{% endif %}
+    {{- clientPort|default('2181', true) }}
+{% endmacro -%}
+
+{%- macro print_host(host, id='') -%}
+    {%- set hostinfo = hostvars[host] -%}
+    {%- set serverinfo = hostinfo.get('ansible_local', {}).get('zookeeper', {}).get('server', {}) -%}
+{{ print_server(hostinfo['zk_hostname']|default(serverinfo['hostname'])|default(host),
+    id|default(hostinfo['zk_id'], true)|default(serverinfo['id'])|default(''),  
+    hostinfo['zk_client_port']|default(serverinfo['clientPort'])|default(''), 
+    hostinfo['zk_leader_port']|default(serverinfo['leaderPort'])|default(''), 
+    hostinfo['zk_election_port']|default(serverinfo['electionPort'])|default(''),
+    hostinfo['zk_client_address']|default(serverinfo['clientPortAddress'])|default(''),
+    hostinfo['zk_role']|default(serverinfo['role'])|default('participant')) }}
+{%- endmacro -%}
+
+{%- macro print_ensemble(group) -%}
+    {%- set ensemble = groups[group] -%}
+    {%- for host in ensemble|sort -%}
+{{ print_host(host, loop.index) }}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{%- if zk_ensemble is defined -%}
+{{ print_ensemble(zk_ensemble) }}
+{%- else -%}
+    {%- for group in group_names if 'ensemble' in group -%}
+{{ print_ensemble(group) }}
+    {%- else -%}
+{{ print_host(inventory_hostname, 1) }}
+    {%- endfor -%}
+{%- endif -%}

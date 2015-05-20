@@ -9,4 +9,16 @@
   template: src=zoo.cfg.j2 dest={{ zk_tree.etc }}/conf/zoo.cfg 
     mode=0644 owner={{ zk_user }} group={{ zk_group }} backup=yes
   notify: zookeeper-service
+
+- name: zookeeper-server dynamic config file exists
+  file: path={{ zk_tree.etc }}/conf/zoo.cfg.dynamic
+  when: zk_version[2]|int > 4
+  ignore_errors: True
+  register: zk_dynamic_cfg
+    
+- name: create zookeeper-server dynamic config file
+  template: src=zoo.cfg.dynamic.j2 dest={{ zk_tree.etc }}/conf/zoo.cfg.dynamic 
+    mode=0644 owner={{ zk_user }} group={{ zk_group }}
+  when: zk_version[2]|int > 4 and zk_dynamic_cfg|failed 
+  notify: zookeeper-service 
   

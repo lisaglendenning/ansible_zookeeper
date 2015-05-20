@@ -5,10 +5,10 @@ zk_service: "{{ zk }}-server"
 #zk_datalog_device:
 
 ## Defaults
+# the port and address to listen for client connections
+#zk_client_port: 2181
+#zk_client_address:
 #zk_conf:
-  # the port to listen for client connections
-  #clientPort: 2181
-  
   # basic time unit in milliseconds
   #tickTime: 2000
   

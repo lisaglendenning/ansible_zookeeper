@@ -33,4 +33,4 @@
 - name: install conf directory
   shell: creates={{ zk_tree.etc }}/conf {{ alternatives_cmd }}
     --install {{ zk_tree.etc }}/conf {{ zk }}-conf {{ zk_tree.etc }}/conf.dist 30
-        
+    && chown -R {{ zk_user }}:{{ zk_group }} {{ zk_tree.etc }}/conf.dist

@@ -5,13 +5,17 @@
 parameters: 
   zk_conf: {} (optional)
   zk_ensemble: string (optional)
+  zk_dynamic_cfg: string (optional)
+  zk_observer: boolean (optional)
   
 -#}
 
-{%- macro print_value(k, v) %}
+{%- macro print_value(k, v) -%}
+{%- if v != '' %}
 {{ k ~ '=' ~ v }}
 {# for whitespacing #}
-{% endmacro -%}
+{% endif -%}
+{%- endmacro -%}
 
 {%- macro print_server(id, hostname='', 
         leaderPort='', electionPort='3888', observer=false) %}
@@ -39,9 +43,12 @@ server.{{ id|default('1', true) }}=
         'syncLimit': 5,
         'initLimit': 10, 
         'dataDir': '/var/lib/zookeeper', 
-        'clientPort': 2181, 
         'tickTime': 2000,}
     -%}
+    
+    {%- if zk_version[2]|int < 5 -%}
+        {%- set _dummy = conf_defaults.update({'clientPort':2181}) -%}
+    {%- endif -%}
     
     {%- call(k, v) iterate_defaults(conf, conf_defaults) %}
 {{ print_value(k, v) }}
@@ -61,8 +68,8 @@ server.{{ id|default('1', true) }}=
         {%- set serverinfo = hostinfo.get('ansible_local', {}).get('zookeeper', {}).get('server', {}) -%}
 {{ print_server(hostinfo['zk_id']|default(serverinfo['id'])|default(loop.index), 
     hostinfo['zk_hostname']|default(serverinfo['hostname'])|default(host), 
-    hostinfo['zk_leaderPort']|default(serverinfo['leaderPort'])|default(''), 
-    hostinfo['zk_electionPort']|default(serverinfo['electionPort'])|default('3888'),
+    hostinfo['zk_leader_port']|default(serverinfo['leaderPort'])|default(''), 
+    hostinfo['zk_election_port']|default(serverinfo['electionPort'])|default('3888'),
     hostinfo['zk_observer']|default(serverinfo['observer'])|default(false)) }}
 {# for whitespacing #}
     {%- endfor -%}
@@ -74,12 +81,14 @@ server.{{ id|default('1', true) }}=
 #
 
 {{ print_conf(zk_conf|default({})) }}
-{%- if zk_ensemble is defined %}
-{{ print_ensemble(zk_ensemble) }}
+{%- if zk_version[2]|int > 4 %}
+{{ print_value('dynamicConfigFile', zk_dynamic_cfg|default(zk_tree.etc ~ '/conf/zoo.cfg.dynamic', true)) }}
 {% else -%}
-    {%- for group in group_names -%}
-        {%- if 'ensemble' in group %}
+    {%- if zk_ensemble is defined %}
+{{ print_ensemble(zk_ensemble) }}
+    {% else -%}
+        {%- for group in group_names if 'ensemble' in group -%}
 {{ print_ensemble(group) }}
-        {%- endif -%}
-    {%- endfor -%}
-{%- endif -%}
+        {%- endfor -%}
+    {%- endif -%}
+{% endif -%}

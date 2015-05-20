@@ -4,7 +4,7 @@
 env_file: /etc/environment
 ant_url_path: ant/binaries
 ant_pkg_name: apache-ant
-ant_version: 1.9.2
+ant_version: 1.9.4
 ant_install_prefix: /usr/local
 ant_home: "{{ ant_install_prefix }}/{{ ant_pkg_name }}"
 ant_cmd: "{{ ant_home }}/bin/ant"

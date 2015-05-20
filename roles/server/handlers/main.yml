@@ -25,8 +25,15 @@
 - name: zookeeper-service id file
   template: src=myid.j2 dest={{ zk_tree.vlb }}/myid
     mode=0644 owner={{ zk_user }} group={{ zk_group }} backup=no
+  notify: 
+    - delete standalone myid file
+    - start zookeeper-service
+
+- name: delete standalone myid file
+  shell: grep -q '^\s*$' myid && rm myid chdir={{ zk_tree.vlb }} removes={{ zk_tree.vlb }}/myid 
+  ignore_errors: yes
   notify: start zookeeper-service
-  
+    
 - name: start zookeeper-service
   command: service {{ zk_service }} start
   notify: check zookeeper-service status

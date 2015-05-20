@@ -1,0 +1,14 @@
+{#- Jinja2 template -#}
+
+{%- macro header(name) -%}
+[{{ name }}]
+{% endmacro -%}
+
+{%- macro print_value(k, v) -%}
+{%- if v != '' -%}
+{{ k ~ '=' ~ v }}
+{% endif -%}
+{%- endmacro -%}
+
+{{ header('server') }}
+{{ print_value('hostname', 'pvt.' ~ inventory_hostname) }}

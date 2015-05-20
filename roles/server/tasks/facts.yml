@@ -1,0 +1,11 @@
+---
+
+- name: create facts directory
+  file: state=directory path=/etc/ansible/facts.d
+        owner=root group=root mode=0755
+  
+- name: create zookeeper facts
+  template: dest=/etc/ansible/facts.d/zookeeper.fact
+    src=zookeeper.fact.j2 owner=root group=root mode=0644
+
+- action: setup
