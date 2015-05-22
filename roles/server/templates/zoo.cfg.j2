@@ -82,6 +82,7 @@ server.{{ id|default('1', true) }}=
 
 {{ print_conf(zk_conf|default({})) }}
 {%- if zk_version[2]|int > 4 %}
+{{ print_value('standaloneEnabled', 'False') }}
 {{ print_value('dynamicConfigFile', zk_dynamic_cfg|default(zk_tree.etc ~ '/conf/zoo.cfg.dynamic', true)) }}
 {% else -%}
     {%- if zk_ensemble is defined %}
