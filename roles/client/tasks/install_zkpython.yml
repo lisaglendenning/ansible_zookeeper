@@ -14,8 +14,7 @@
 - include: ../../common/tasks/extract.yml
       file={{ zk_client_python_package }}
       expected={{ lib_path.stdout }}/zookeeper.so
-      user={{ zk_user }} 
-      group={{ zk_group }}
+      user=root
       dir={{ zk_release_path }}
       
 - shell: install -m 755 -C -t {{ python_libdir }} 
